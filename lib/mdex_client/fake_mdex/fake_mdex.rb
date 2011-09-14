@@ -17,7 +17,7 @@ class FakeMDEX
   def self.navigation_result
     xml = Nokogiri::XML.parse(File.new(NAVIGATION_RESULT_FILE))
     result = xml.xpath("/env:Envelope/env:Body/mdata:Response/mdata:TypedResult/mdata:NavigationResults",
-      MDEX::Client::NAMESPACES)
-    MDEX::MData::NavigationResult.new(result)
+      MDEXClient::Client::NAMESPACES)
+    MDEXClient::MData::NavigationResult.new(result)
   end
 end

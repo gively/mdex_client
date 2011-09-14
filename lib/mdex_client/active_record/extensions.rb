@@ -39,7 +39,7 @@ module MDEXClient
         end
 
         def mdex_navigation_query(params={})
-          query = MDEX::MData::NavigationQuery.new(params)
+          query = MDEXClient::MData::NavigationQuery.new(params)
           query.included_record_attributes = mdex_included_record_attributes
           query.expose_all_refinements = true
           

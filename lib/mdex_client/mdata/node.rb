@@ -17,7 +17,7 @@ module MDEXClient
             send("#{key}=", value)
           end
         else
-          raise "Invalid type to initialize a MDEX::MData::Node: #{element_or_hash.class}"
+          raise "Invalid type to initialize a MDEXClient::MData::Node: #{element_or_hash.class}"
         end
       end
       
@@ -27,11 +27,11 @@ module MDEXClient
       end
       
       def css(search)
-        @element.css(search, MDEX::Client::NAMESPACES)
+        @element.css(search, MDEXClient::Client::NAMESPACES)
       end
       
       def xpath(search)
-        @element.xpath(search, MDEX::Client::NAMESPACES)
+        @element.xpath(search, MDEXClient::Client::NAMESPACES)
       end
       
       def record_list(search)

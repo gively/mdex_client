@@ -27,7 +27,7 @@ module MDEXClient
     def xquery(xquery)
       response = @soap_client.request("Request") do
         soap.xml do |xml| 
-          xml.env(:Envelope, MDEX::Client.namespace_declarations) do
+          xml.env(:Envelope, MDEXClient::Client.namespace_declarations) do
             xml.env :Header
             xml.env(:Body) do
               xml.mdata :Request, xquery
