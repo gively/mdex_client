@@ -1,0 +1,787 @@
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.endeca.com/MDEX/data/IR600" name="MDEX" targetNamespace="http://www.endeca.com/MDEX/data/IR600">
+
+	<types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.endeca.com/MDEX/data/IR600">
+
+			<simpleType name="DimensionValueId">
+				<restriction base="string">
+					<pattern value="[0-9]+"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="DimensionValueList">
+				<sequence>
+					<element name="DimensionValue" type="tns:DimensionValue" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="Attribute">
+				<simpleContent>
+					<extension base="string">
+						<attribute name="Key" type="string" use="required"/>
+					</extension>
+				</simpleContent>
+			</complexType>
+
+			<complexType name="Property">
+				<simpleContent>
+					<extension base="tns:Attribute"/>
+				</simpleContent>
+			</complexType>
+
+
+			<complexType name="PropertyList">
+				<sequence>
+					<element name="Property" type="tns:Property" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<simpleType name="MultiSelect">
+				<restriction base="string">
+					<enumeration value="And"/>
+					<enumeration value="Or"/>
+					<enumeration value="None"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="DimensionValue">
+				<sequence>
+					<element name="DimensionValues" type="tns:DimensionValueList" minOccurs="0" maxOccurs="1"/>
+					<element name="Properties" type="tns:PropertyList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+				<attribute name="Name" type="string" use="required"/>
+				<attribute name="Id" type="tns:DimensionValueId" use="required"/>
+				<attribute name="IsLeaf" type="boolean" use="required"/>
+				<attribute name="IsNavigable" type="boolean" use="required"/>
+				<attribute name="StaticRecordCount" type="unsignedLong" use="optional"/>
+			</complexType>
+
+			<complexType name="Dimension">
+				<sequence>
+					<element name="DimensionValue" type="tns:DimensionValue"/>
+				</sequence>
+				<attribute name="Name" type="string" use="required"/>
+				<attribute name="Id" type="tns:DimensionValueId" use="required"/>
+				<attribute name="MultiSelect" type="tns:MultiSelect" use="required"/>
+				<attribute name="GroupName" type="string" use="optional"/>
+			</complexType>
+
+			<complexType name="DimensionList">
+				<sequence>
+					<element name="Dimension" type="tns:Dimension" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="RefinementConfig">
+				<attribute name="DimensionValueId" type="tns:DimensionValueId" use="required"/>
+				<attribute name="Expose" type="boolean" default="true"/>
+				<attribute name="LimitDimensionValues" type="boolean"/>
+				<attribute name="OrderByRecordCount" type="boolean"/>
+				<attribute name="MaximumDimensionValueCount" type="unsignedLong"/>
+			</complexType>
+
+			<complexType name="RefinementConfigList">
+				<sequence>
+					<element name="RefinementConfig" type="tns:RefinementConfig" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="ExposeAllRefinements" type="boolean" use="optional"/>
+			</complexType>
+
+			<complexType name="DimensionValueState">
+				<attribute name="Name" type="string" use="required"/>
+				<attribute name="Id" type="tns:DimensionValueId" use="required"/>
+			</complexType>
+
+			<complexType name="DimensionValueStateList">
+				<sequence>
+					<element name="DimensionValueReference" type="tns:DimensionValueState" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="RefinementList">
+				<complexContent>
+					<extension base="tns:DimensionValueStateList">
+						<attribute name="ParentName" type="string" use="required"/>
+						<attribute name="ParentId" type="tns:DimensionValueId" use="required"/>
+						<attribute name="HasMore" type="boolean" use="required"/>
+						<attribute name="IsRefinable" type="boolean" use="required"/>
+					</extension>
+				</complexContent>
+			</complexType>
+
+			<complexType name="DimensionState">
+				<sequence>
+					<element name="Refinements" type="tns:RefinementList" minOccurs="1" maxOccurs="unbounded"/>
+					<element name="SelectedDimensionValues" type="tns:DimensionValueStateList" minOccurs="0" maxOccurs="1"/>
+					<element name="ImplicitDimensionValues" type="tns:DimensionValueStateList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+				<attribute name="DimensionName" type="string" use="required"/>
+				<attribute name="DimensionId" type="tns:DimensionValueId" use="required"/>
+			</complexType>
+
+			<complexType name="DimensionStateList">
+				<sequence>
+					<element name="DimensionState" type="tns:DimensionState" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="NavigationStatesResult">
+				<sequence>
+					<element name="RefinementConfigs" type="tns:RefinementConfigList" minOccurs="0" maxOccurs="1"/>
+					<element name="DimensionStates" type="tns:DimensionStateList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="Geocode">
+				<attribute name="Latitude" type="double" use="required"/>
+				<attribute name="Longitude" type="double" use="required"/>
+			</complexType>
+
+			<simpleType name="SortDirection">
+				<restriction base="string">
+					<enumeration value="Ascending"/>
+					<enumeration value="Descending"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="Sort">
+				<sequence>
+					<element name="ReferenceGeocode" type="tns:Geocode" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+				<attribute name="Key" type="string" use="required"/>
+				<attribute name="Direction" type="tns:SortDirection" use="optional"/>
+			</complexType>
+
+			<simpleType name="SearchMode">
+				<restriction base="string">
+					<enumeration value="All"/>
+					<enumeration value="AllAny"/>
+					<enumeration value="AllPartial"/>
+					<enumeration value="Any"/>
+					<enumeration value="Boolean"/>
+					<enumeration value="Partial"/>
+					<enumeration value="PartialMax"/>
+					<enumeration value="Unknown"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="RelevanceRanking">
+				<simpleContent>
+					<extension base="string">
+						<attribute name="Key" type="string" use="required"/>
+						<attribute name="Strategy" type="string" use="required"/>
+						<attribute name="Mode" type="tns:SearchMode"/>
+					</extension>
+				</simpleContent>
+			</complexType>
+
+			<complexType name="SortList">
+				<sequence>
+					<choice>
+						<element name="Sort" type="tns:Sort" minOccurs="0" maxOccurs="unbounded"/>
+						<element name="RelevanceRanking" type="tns:RelevanceRanking"/>
+					</choice>
+				</sequence>
+			</complexType>
+
+			<complexType name="IncludedRecordAttributeList">
+				<sequence>
+					<element name="IncludedRecordAttribute" type="string" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<simpleType name="RecordsPerAggregateRecord">
+				<restriction base="string">
+					<enumeration value="All"/>
+					<enumeration value="None"/>
+					<enumeration value="One"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="AggregationKey">
+				<simpleContent>
+					<extension base="string">
+						<attribute name="RecordsPerAggregateRecord" type="tns:RecordsPerAggregateRecord"/>
+					</extension>
+				</simpleContent>
+			</complexType>
+
+			<complexType name="AttributeDimensionValue">
+				<simpleContent>
+					<extension base="tns:Attribute">
+						<attribute name="DimensionId" type="tns:DimensionValueId" use="required"/>
+						<attribute name="Id" type="tns:DimensionValueId" use="required"/>
+					</extension>
+				</simpleContent>
+			</complexType>
+
+			<complexType name="AttributeList">
+				<choice minOccurs="1" maxOccurs="unbounded">
+					<element name="AssignedDimensionValue" type="tns:AttributeDimensionValue"/>
+					<element name="Property" type="tns:Property"/>
+				</choice>
+			</complexType>
+
+			<complexType name="SnippetList">
+				<sequence>
+					<element name="Snippet" type="tns:Property" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="Record">
+				<sequence>
+					<element name="Attributes" type="tns:AttributeList" minOccurs="0" maxOccurs="1"/>
+					<element name="Snippets" type="tns:SnippetList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+				<attribute name="Id" type="string" use="required"/>
+			</complexType>
+
+			<complexType name="AggregateRecord">
+				<complexContent>
+					<extension base="tns:Record">
+						<sequence>
+							<element name="DerivedProperties" type="tns:PropertyList" minOccurs="0" maxOccurs="1"/>
+							<element name="ConstituentRecords" type="tns:RecordList" minOccurs="0" maxOccurs="1"/>
+						</sequence>
+						<attribute name="RecordsInAggregate" type="unsignedLong" use="required"/>
+					</extension>
+				</complexContent>
+			</complexType>
+
+			<complexType name="RecordList">
+				<sequence>
+					<choice>
+						<element name="Record" type="tns:Record" minOccurs="1" maxOccurs="unbounded"/>
+						<element name="AggregateRecord" type="tns:AggregateRecord" minOccurs="1" maxOccurs="unbounded"/>
+					</choice>
+				</sequence>
+			</complexType>
+
+			<complexType name="RecordsResult">
+				<sequence>
+					<element name="Sorts" type="tns:SortList" minOccurs="0" maxOccurs="1"/>
+					<element name="IncludedRecordAttributes" type="tns:IncludedRecordAttributeList" minOccurs="0" maxOccurs="1"/>
+					<element name="AggregationKey" type="tns:AggregationKey" minOccurs="0" maxOccurs="1"/>
+					<element name="Records" type="tns:RecordList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+				<attribute name="Offset" type="unsignedLong" use="required"/>
+				<attribute name="RecordsPerPage" type="unsignedLong" use="required"/>
+				<attribute name="TotalRecordCount" type="unsignedLong" use="required"/>
+				<attribute name="TotalAggregateRecordCount" type="unsignedLong" use="optional"/>
+			</complexType>
+
+			<complexType name="RangeFilter">
+				<attribute name="AttributeName" type="string" use="required"/>
+			</complexType>
+
+			<complexType name="LessThanFilter">
+				<complexContent>
+					<extension base="tns:RangeFilter">
+						<sequence>
+							<element name="GeocodeReference" type="tns:Geocode" minOccurs="0" maxOccurs="1"/>
+						</sequence>
+						<attribute name="UpperBound" type="double"/>
+					</extension>
+				</complexContent>
+			</complexType>
+
+			<complexType name="LessThanOrEqualFilter">
+				<complexContent>
+					<extension base="tns:RangeFilter">
+						<attribute name="UpperBound" type="double"/>
+					</extension>
+				</complexContent>
+			</complexType>
+
+			<complexType name="GreaterThanFilter">
+				<complexContent>
+					<extension base="tns:RangeFilter">
+						<sequence>
+							<element name="GeocodeReference" type="tns:Geocode" minOccurs="0" maxOccurs="1"/>
+						</sequence>
+						<attribute name="LowerBound" type="double"/>
+					</extension>
+				</complexContent>
+			</complexType>
+
+			<complexType name="GreaterThanOrEqualFilter">
+				<complexContent>
+					<extension base="tns:RangeFilter">
+						<attribute name="LowerBound" type="double"/>
+					</extension>
+				</complexContent>
+			</complexType>
+
+			<complexType name="BetweenFilter">
+				<complexContent>
+					<extension base="tns:RangeFilter">
+						<sequence>
+							<element name="GeocodeReference" type="tns:Geocode" minOccurs="0" maxOccurs="1"/>
+						</sequence>
+						<attribute name="LowerBound" type="double"/>
+						<attribute name="UpperBound" type="double"/>
+					</extension>
+				</complexContent>
+			</complexType>
+
+			<complexType name="RangeFilterList">
+				<sequence>
+					<choice minOccurs="1" maxOccurs="unbounded">
+						<element name="LessThanFilter" type="tns:LessThanFilter"/>
+						<element name="LessThanOrEqualFilter" type="tns:LessThanOrEqualFilter"/>
+						<element name="GreaterThanFilter" type="tns:GreaterThanFilter"/>
+						<element name="GreaterThanOrEqualFilter" type="tns:GreaterThanOrEqualFilter"/>
+						<element name="BetweenFilter" type="tns:BetweenFilter"/>
+					</choice>
+				</sequence>
+			</complexType>
+
+			<complexType name="Search">
+			  <simpleContent>
+				 <extension base="string">
+					<attribute name="Key" type="string" use="required"/>
+					<attribute name="RelevanceRankingStrategy" type="string"/>
+					<attribute name="Mode" type="tns:SearchMode"/>
+					<attribute name="SnippetLength" type="unsignedLong" use="optional"/>
+					<attribute name="EnableSnippeting" type="boolean" use="optional"/>
+					</extension>
+				</simpleContent>
+			</complexType>
+
+			<complexType name="DimensionSearch">
+				<simpleContent>
+					<extension base="string">
+						<attribute name="RelevanceRankingStrategy" type="string"/>
+        					<attribute name="Mode" type="tns:SearchMode"/>
+					</extension>
+				</simpleContent>
+			</complexType>
+
+			<complexType name="CompoundDimensionSearch">
+				<simpleContent>
+					<extension base="string">
+        					<attribute name="Mode" type="tns:SearchMode"/>
+					</extension>
+				</simpleContent>
+			</complexType>
+
+			<simpleType name="AdjustmentType">
+				<restriction base="string">
+					<enumeration value="Phrasing"/>
+					<enumeration value="SpellingCorrection"/>
+					<enumeration value="WordBreak"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="SearchAdjustment">
+				<sequence>
+					<element name="AdjustmentType" type="tns:AdjustmentType" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="Terms" type="string" use="required"/>
+				<attribute name="RecordCountIfApplied" type="unsignedLong" use="required"/>
+			</complexType>
+
+			<complexType name="SearchAdjustmentList">
+				<sequence>
+					<element name="SearchAdjustment" type="tns:SearchAdjustment" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="WordInterpretationList">
+				<sequence>
+					<element name="WordInterpretation" type="tns:Property" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+		
+			<complexType name="SearchReport">
+				<sequence>
+					<element name="ErrorMessage" type="string" minOccurs="0" maxOccurs="1"/>
+					<choice>
+						<sequence>
+							<element name="Search" type="tns:Search"/>
+							<element name="MatchedRecordCount" type="unsignedLong"/>
+						</sequence>
+						<sequence>
+							<element name="DimensionSearch" type="tns:DimensionSearch"/>
+							<element name="MatchedDimensionValueCount" type="unsignedLong"/>
+						</sequence>
+						<sequence>
+							<element name="CompoundDimensionSearch" type="tns:CompoundDimensionSearch"/>
+							<element name="MatchedCompoundDimensionValueCount" type="unsignedLong"/>
+						</sequence>
+					</choice>
+					<element name="MatchedMode" type="tns:SearchMode"/>
+					<element name="MatchedTermsCount" type="unsignedLong"/>
+					<element name="AppliedSearchAdjustments" type="tns:SearchAdjustmentList" minOccurs="0" maxOccurs="1"/>
+					<element name="SuggestedSearchAdjustments" type="tns:SearchAdjustmentList" minOccurs="0" maxOccurs="1"/>
+					<element name="TruncatedTerms" type="string" minOccurs="0" maxOccurs="1"/>
+					<element name="WordInterpretations" type="tns:WordInterpretationList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="SearchReportList">
+				<sequence>
+					<element name="SearchReport" type="tns:SearchReport" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="DimensionValueIdList">
+				<sequence>
+					<element name="DimensionValueId" type="tns:DimensionValueId" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="NavigationAppliedFilters">
+				<sequence>
+					<element name="EqlExpression" type="string" minOccurs="0" maxOccurs="1"/>
+					<element name="RangeFilters" type="tns:RangeFilterList" minOccurs="0" maxOccurs="1"/>
+					<element name="RecordFilter" type="string" minOccurs="0" maxOccurs="1"/>
+					<element name="SearchReports" type="tns:SearchReportList" minOccurs="0" maxOccurs="1"/>
+					<element name="SelectedDimensionValueIds" type="tns:DimensionValueIdList" minOccurs="0" maxOccurs="1"/>
+					<element name="LanguageId" type="string" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="BusinessRule">
+				<sequence>
+					<element name="SelectedDimensionValueIds" type="tns:DimensionValueIdList" minOccurs="0" maxOccurs="1"/>
+					<element name="Properties" type="tns:PropertyList" minOccurs="0" maxOccurs="1"/>
+					<element name="Records" type="tns:RecordList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+				<attribute name="Id" type="string" use="required"/>
+				<attribute name="NavigationStateRecordCount" type="unsignedLong" use="required"/>
+				<attribute name="SortAttribute" type="string" use="optional"/>
+				<attribute name="Style" type="string" use="required"/>
+				<attribute name="Title" type="string" use="required"/>
+				<attribute name="Zone" type="string" use="required"/>
+				<attribute name="SortDirection" type="tns:SortDirection" use="optional"/>
+			</complexType>
+
+			<complexType name="BusinessRuleList">
+				<sequence>
+					<element name="BusinessRule" type="tns:BusinessRule" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="BusinessRulesResult">
+				<sequence>
+					<element name="BusinessRulesFilter" type="string" minOccurs="0"/>
+					<element name="BusinessRulesPreviewTime" type="dateTime" minOccurs="0"/>
+					<element name="BusinessRules" type="tns:BusinessRuleList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="KeywordRedirectList">
+				<sequence>
+					<element name="KeywordRedirect" type="string" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="AnalyticsStatementResult">
+				<sequence>
+					<element name="Record" type="tns:Record" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="Name" type="string" use="required"/>
+				<attribute name="TotalRecordCount" type="unsignedLong" use="required"/>
+			</complexType>
+
+			<complexType name="AnalyticsResult">
+				<sequence>
+				<element name="AnalyticsStatementResult" type="tns:AnalyticsStatementResult" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="NavigationResult">
+				<sequence>
+					<element name="Dimensions" type="tns:DimensionList"/>
+					<element name="NavigationStatesResult" type="tns:NavigationStatesResult"/>
+					<element name="RecordsResult" type="tns:RecordsResult"/>
+					<element name="AppliedFilters" type="tns:NavigationAppliedFilters"/>
+					<element name="BusinessRulesResult" type="tns:BusinessRulesResult"/>
+					<element name="KeywordRedirects" type="tns:KeywordRedirectList"/>
+					<element name="AnalyticsResult" type="tns:AnalyticsResult"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="DimensionSearchAppliedFilters">
+				<sequence>
+					<element name="EqlExpression" type="string" minOccurs="0"/>
+					<element name="RangeFilters" type="tns:RangeFilterList" minOccurs="0"/>
+					<element name="RecordFilter" type="string" minOccurs="0"/>
+					<element name="SearchReport" type="tns:SearchReport"/>
+					<element name="SearchWithinDimensionValueId" type="tns:DimensionValueId" minOccurs="0"/>
+					<element name="SelectedDimensionValueIds" type="tns:DimensionValueIdList" minOccurs="0"/>
+					<element name="LanguageId" type="string" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="ResultDimension">
+				<sequence>
+					<element name="MatchingDimensionValue" type="tns:AttributeDimensionValue" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="Name" type="string" use="required"/>
+				<attribute name="Id" type="tns:DimensionValueId" use="required"/>
+			</complexType>
+
+			<complexType name="ResultDimensionList">
+				<sequence>
+					<element name="MatchingDimension" type="tns:ResultDimension" minOccurs="1" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+			
+			<complexType name="MatchingDimensionsResult">
+				<sequence>
+					<element name="DimensionValuesPerDimension" type="unsignedLong" minOccurs="0"/>
+					<element name="MatchingDimensions" type="tns:ResultDimensionList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+				<attribute name="HasMore" type="boolean" use="required"/>
+			</complexType>
+
+			<complexType name="DimensionSearchResult">
+				<sequence>
+					<element name="Dimensions" type="tns:DimensionList"/>
+					<element name="MatchingDimensionsResult" type="tns:MatchingDimensionsResult"/>
+					<element name="AppliedFilters" type="tns:DimensionSearchAppliedFilters"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="MatchingDimensionValueList">
+				<sequence>
+					<element name="MatchingDimensionValue" type="tns:AttributeDimensionValue" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="CompoundDimensionValueList">
+				<sequence>
+					<element name="MatchingCompoundDimensionValue" type="tns:MatchingDimensionValueList" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="MatchingCompoundDimensionsResult">
+				<sequence>
+					<element name="DimensionValuesPerDimension" type="unsignedLong" minOccurs="0"/>
+					<element name="MatchingCompoundDimensionValues" type="tns:CompoundDimensionValueList"/>
+				</sequence>
+				<attribute name="HasMore" type="boolean" use="required"/>
+			</complexType>
+
+			<complexType name="CompoundDimensionSearchAppliedFilters">
+				<sequence>
+					<element name="EqlExpression" type="string" minOccurs="0"/>
+					<element name="RangeFilters" type="tns:RangeFilterList" minOccurs="0"/>
+					<element name="RecordFilter" type="string" minOccurs="0"/>
+					<element name="SearchReport" type="tns:SearchReport" minOccurs="0"/>
+					<element name="SearchWithinDimensionValueIds" type="tns:DimensionValueIdList" minOccurs="0"/>
+					<element name="SelectedDimensionValueIds" type="tns:DimensionValueIdList" minOccurs="0"/>
+					<element name="LanguageId" type="string" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="CompoundDimensionSearchResult">
+				<sequence>
+					<element name="Dimensions" type="tns:DimensionList"/>
+					<element name="MatchingCompoundDimensionsResult" type="tns:MatchingCompoundDimensionsResult"/>
+					<element name="AppliedFilters" type="tns:CompoundDimensionSearchAppliedFilters"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="SearchKey">
+				<simpleContent>
+					<extension base="string">
+						<attribute name="IsSearchInterface" type="boolean" use="required"/>
+					</extension>
+				</simpleContent>
+			</complexType>
+  
+			<complexType name="SearchKeyList">
+				<sequence>
+					<element name="SearchKey" type="tns:SearchKey" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="SortKeyList">
+				<sequence>
+					<element name="SortKey" type="string" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="AggregationKeyList">
+				<sequence>
+					<element name="AggregationKey" type="string" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="AttributeMetadata">
+				<sequence>
+					<element name="Properties" type="tns:PropertyList" minOccurs="0" maxOccurs="1"/>
+				</sequence>
+				<attribute name="Name" type="string" use="required"/>
+			</complexType>
+
+			<complexType name="AttributeMetadataList">
+				<sequence>
+					<element name="AttributeMetadata" type="tns:AttributeMetadata" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="MetadataResult">
+				<sequence>
+					<element name="SearchKeys" type="tns:SearchKeyList"/>
+					<element name="SortKeys" type="tns:SortKeyList"/>
+					<element name="AggregationKeys" type="tns:AggregationKeyList"/>
+					<element name="AttributeMetadataList" type="tns:AttributeMetadataList"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="RecordDetailsAppliedFilters">
+				<sequence>
+					<element name="RecordFilter" type="string" minOccurs="0"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="RecordDetailsResult">
+				<sequence>
+					<element name="Dimensions" type="tns:DimensionList"/>
+					<element name="Record" type="tns:Record"/>
+					<element name="AppliedFilters" type="tns:RecordDetailsAppliedFilters"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="AggregateRecordDetailsAppliedFilters">
+				<sequence>
+					<element name="SelectedDimensionValueIds" type="tns:DimensionValueIdList" minOccurs="0"/>
+					<element name="EqlExpression" type="string" minOccurs="0"/>
+					<element name="RecordFilter" type="string" minOccurs="0"/>
+					<element name="RangeFilters" type="tns:RangeFilterList" minOccurs="0"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="AggregateRecordDetailsResult">
+				<sequence>
+					<element name="Dimensions" type="tns:DimensionList"/>
+					<element name="AggregateRecord" type="tns:AggregateRecord"/>
+					<element name="AppliedFilters" type="tns:AggregateRecordDetailsAppliedFilters"/>
+				</sequence>
+				<attribute name="AggregationKey" type="string" use="required"/>
+			</complexType>
+
+			<element name="Request">
+				<simpleType>
+					<restriction base="string"/>
+				</simpleType>
+			</element>
+
+			<complexType name="UntypedResult">
+				<sequence>
+					<any processContents="lax"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="TypedResult">
+				<sequence>
+					<choice>  
+						<element name="NavigationResults" type="tns:NavigationResult"/>
+						<element name="DimensionSearchResults" type="tns:DimensionSearchResult"/>
+						<element name="CompoundDimensionSearchResults" type="tns:CompoundDimensionSearchResult"/>
+						<element name="MetadataResults" type="tns:MetadataResult"/>
+						<element name="RecordDetailsResults" type="tns:RecordDetailsResult"/>
+						<element name="AggregateRecordDetailsResults" type="tns:AggregateRecordDetailsResult"/>
+					</choice>
+				</sequence>
+			</complexType>
+
+			<element name="Response">
+				<complexType>
+					<sequence>
+						<choice minOccurs="0" maxOccurs="unbounded">
+							<element name="UntypedResult" type="tns:UntypedResult"/>
+							<element name="TypedResult" type="tns:TypedResult"/>
+						</choice>
+					</sequence>
+				</complexType>
+			</element>
+
+			<complexType name="Location">
+				<attribute name="line" type="string" use="required"/>
+				<attribute name="column" type="string" use="required"/>
+			</complexType>
+
+			<complexType name="Span">
+				<sequence>
+					<element name="Start" type="tns:Location"/>
+					<element name="End" type="tns:Location"/>
+				</sequence>
+				<attribute name="uri" type="string" use="required"/>
+			</complexType>
+
+			<complexType name="StackTrace">
+				<sequence>
+					<element name="Span" type="tns:Span" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="ErrorSequence">
+				<sequence>
+					<any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</complexType>
+
+			<element name="Fault">
+				<complexType>
+					<sequence>
+						<element name="ErrorCode" type="string"/>
+						<element name="ErrorDetail" type="string"/>
+						<element name="ErrorSequence" type="tns:ErrorSequence"/>
+						<element name="StackTrace" type="tns:StackTrace"/>
+					</sequence>
+				</complexType>
+			</element>
+
+		</schema>
+	</types>
+
+	<message name="MDEXRequest">
+		<part name="request" element="tns:Request"/>
+	</message>
+
+	<message name="MDEXResponse">
+		<part name="response" element="tns:Response"/>
+	</message>
+
+	<message name="MDEXFault">
+		<part name="fault" element="tns:Fault"/>
+	</message>
+
+	<portType name="MDEXPort">
+		<operation name="query">
+			<input name="request" message="tns:MDEXRequest"/>
+			<output name="response" message="tns:MDEXResponse"/>
+			<fault name="fault" message="tns:MDEXFault"/>
+		</operation>
+	</portType>
+
+	<binding name="MDEXSoapBinding" type="tns:MDEXPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="query">
+			<soap:operation soapAction=""/>
+			<input name="request">
+				<soap:body use="literal"/>
+			</input>
+			<output name="response">
+				<soap:body use="literal"/>
+			</output>
+			<fault name="fault">
+				<soap:fault use="literal" name="fault"/>
+			</fault>
+		</operation>
+	</binding>
+
+	<service name="MDEX">
+		<documentation>MDEX Evaluation Service</documentation>
+
+		<!-- connect the port to the "MDEXSoapBinding" above -->
+		<port name="MDEXPort" binding="tns:MDEXSoapBinding">
+			
+		</port>
+	</service>
+</definitions>
