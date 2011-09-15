@@ -62,6 +62,14 @@ module MDEXClient
         xml.mdata :EqlExpression, eql_expression if eql_expression
         xml.mdata :RecordFilter, record_filter if record_filter
         
+        if range_filters.present?
+        	xml.mdata :RangeFilters do
+	        	range_filters.each do |filter|
+	        		filter.write_xml!(xml)
+  	      	end
+  	      end
+        end
+        
         if searches && searches.any? { |key, search| search.query.present? }
           searches_attrs = {}
           searches_attrs["EnableDidYouMean"] = enable_did_you_mean.to_s if enable_did_you_mean
@@ -96,7 +104,7 @@ module MDEXClient
       def refinement_configs=(new_rcs)
         @refinement_configs = convert_items(new_rcs, RefinementConfig)
       end
-      
+            
       def main_search_query
         @searches ||= {}
         @searches["mainSearch"].try(:query)
