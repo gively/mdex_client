@@ -1,6 +1,7 @@
 require 'mdex_client/mdata/node'
 require 'mdex_client/mdata/sort'
 require 'mdex_client/mdata/search'
+require 'mdex_client/mdata/range_filter'
 
 module MDEXClient
   module MData
