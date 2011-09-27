@@ -42,7 +42,7 @@ module MDEXClient
     	
     	module UpperBound
     		def included(mod)
-    			mod.class_eval { attr_accessor :upper_bound }
+    			mod.instance_eval { attr_accessor :upper_bound }
     		end
     		
     		def init_upper_bound_from_element!
@@ -56,7 +56,7 @@ module MDEXClient
     	
     	module LowerBound
     		def included(mod)
-    			mod.class_eval { attr_accessor :lower_bound }
+    			mod.instance_eval { attr_accessor :lower_bound }
     		end
     		
     		def init_lower_bound_from_element!
@@ -70,7 +70,7 @@ module MDEXClient
     	
     	module GeocodeReference
     		def included(mod)
-    			mod.class_eval { attr_accessor :geocode_reference }
+    			mod.instance_eval { attr_accessor :geocode_reference }
     		end
     		
     		def init_geocode_reference_from_element!
