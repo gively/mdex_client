@@ -13,14 +13,14 @@ module MDEXClient
     		end
     	end
     
-    	attr_accessor :attribute
+    	attr_accessor :attribute_name
     	
     	def initialize_from_element!
-    		@attribute = element["Attribute"]
+    		@attribute_name = element["AttributeName"]
     	end
     	
     	def attribute_attr
-    		{ "Attribute" => @attribute }
+    		{ "AttributeName" => @attribute_name }
     	end
     	
     	def self.from_element(element)
