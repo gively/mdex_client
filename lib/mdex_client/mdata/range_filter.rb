@@ -41,10 +41,8 @@ module MDEXClient
      	end
     	
     	module UpperBound
-    		def included(mod)
-    			mod.instance_eval { attr_accessor :upper_bound }
-    		end
-    		
+    	  attr_accessor :upper_bound
+    	
     		def init_upper_bound_from_element!
     			@upper_bound = element["UpperBound"].to_f
     		end
@@ -55,10 +53,8 @@ module MDEXClient
     	end
     	
     	module LowerBound
-    		def included(mod)
-    			mod.instance_eval { attr_accessor :lower_bound }
-    		end
-    		
+    	  attr_accessor :lower_bound
+    	
     		def init_lower_bound_from_element!
     			@lower_bound = element["LowerBound"].to_f
     		end
@@ -69,10 +65,8 @@ module MDEXClient
     	end
     	
     	module GeocodeReference
-    		def included(mod)
-    			mod.instance_eval { attr_accessor :geocode_reference }
-    		end
-    		
+    	  attr_accessor :geocode_reference
+    	  
     		def init_geocode_reference_from_element!
 	    		gc = xpath("mdata:GeocodeReference")
     			@geocode_reference = Geocode.new(gc) if gc
